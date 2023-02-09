@@ -31,7 +31,7 @@ class ElasticsearchQuery
     public function __construct(string $index, string $doc=null)
     {
         $this->client = app('elastic_query');
-        $this->index = (defined('ELASTICSEARCH_INDEX_PREFIX')?ELASTICSEARCH_INDEX_PREFIX:'').$index;
+        $this->index = config('elasticsearch.prefix').$index;
         $this->doc =$doc;
     }
 
@@ -366,13 +366,13 @@ class ElasticsearchQuery
         },$matchs);
 
         $this->function_score = [
-                "boost" => $boost,
-                "functions" =>$functions,
-                "max_boost" => $max_boost,
-                "score_mode" => $score_mode,
-                "boost_mode" => $boost_mode,
-                "min_score" => $min_score
-            ];
+            "boost" => $boost,
+            "functions" =>$functions,
+            "max_boost" => $max_boost,
+            "score_mode" => $score_mode,
+            "boost_mode" => $boost_mode,
+            "min_score" => $min_score
+        ];
         return $this;
     }
 
@@ -506,7 +506,7 @@ class ElasticsearchQuery
 
     static function indexExists($name){
         $time_start = microtime(true);
-        $query = ['index' => (defined('ELASTICSEARCH_INDEX_PREFIX')?ELASTICSEARCH_INDEX_PREFIX:'').$name];
+        $query = ['index' => config('elasticsearch.prefix').$name];
         $value = app('elastic_query')->indices()->exists($query);
         self::logQuery($query,$time_start,"INDEX_EXISTS");
         return $value;
@@ -514,7 +514,7 @@ class ElasticsearchQuery
 
     static function deleteIndex($name){
         $time_start = microtime(true);
-        $query = ['index' => (defined('ELASTICSEARCH_INDEX_PREFIX')?ELASTICSEARCH_INDEX_PREFIX:'').$name];
+        $query = ['index' => config('elasticsearch.prefix').$name];
         $value = app('elastic_query')->indices()->delete($query);
         self::logQuery($query,$time_start,"DELETE_INDEX");
         return $value;
@@ -529,7 +529,7 @@ class ElasticsearchQuery
 
     static function createIndexByOptions($name,$number_of_shards=15,$number_of_replicas=1,$mappings=null){
         $query = [
-            'index' => (defined('ELASTICSEARCH_INDEX_PREFIX')?ELASTICSEARCH_INDEX_PREFIX:'').$name,
+            'index' => config('elasticsearch.prefix').$name,
             'body' => [
                 'settings' => [
                     'number_of_shards' => $number_of_shards,
@@ -547,7 +547,7 @@ class ElasticsearchQuery
     }
 
     static function logQuery($query,$time_start,$type='GET'){
-        if(defined('ELASTICSEARCH_LOG_DEBUGBAR')&&ELASTICSEARCH_LOG_DEBUGBAR===true){
+        if(config('elasticsearch.debugbar')===true){
             $time_end = microtime(true);
             $time =(string) (($time_end - $time_start)*1000);
             $time = round($time);

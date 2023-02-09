@@ -1,13 +1,19 @@
 ### Elastic Query Builder For Lumen, Laravel
 # Install
 ```
-composer require ngocnm/elastic-query
+composer require ngocnm/laravel-elasticsearch
 ```
 # Config
 - Register Service Provider
 ```php
 \Ngocnm\ElasticQuery\ElasticsearchServiceProvider::class
 ```
+
+- Publish config file ```config/elasticsearch.php```
+```bash
+php artisan vendor:publish --tag=config
+```
+
 - Define env
 ```dotenv
 ELASTIC_HOST = localhost,localhost_2 #default: localhost
@@ -20,39 +26,6 @@ ELASTIC_PATH= /data/elastic #default: null
 ELASTICSEARCH_SSN_LOG_DEBUGBAR = true # add log query to debugbar  on core sosanhnha
 ELASTIC_CACHE_ENABLED=true #default: true
 ```
-
-- Config without laravel lumen
-    - Create singleton with key (elastic_query):
-        ```php
-      define('ELASTICSEARCH_INDEX_PREFIX',env('ELASTIC_INDEX_PREFIX',''));
-      define('ELASTICSEARCH_SSN_LOG_DEBUGBAR',env('ELASTICSEARCH_SSN_LOG_DEBUGBAR',false));
-     
-      $app->singleton("elastic_query",function(){
-            $hosts = env('ELASTIC_HOST','localhost');
-            $hosts_config = [
-                'port'=>env('ELASTIC_PORT',9200),
-                'scheme'=>env('ELASTIC_SCHEME','http'),
-                'host'=>$hosts
-            ];
-            if(!empty(env('ELASTIC_PASSWORD',null))) $hosts_config['pass'] = env('ELASTIC_PASSWORD');
-            if(!empty(env('ELASTIC_USERNAME',null))) $hosts_config['user'] = env('ELASTIC_USERNAME');
-            if(!empty(env('ELASTIC_PATH',null))) $hosts_config['path'] = env('ELASTIC_PATH');
-            if(!empty(env('ELASTIC_SCHEME',null))) $hosts_config['scheme'] = env('ELASTIC_SCHEME');
-            
-            if(strpos($hosts,',')!==false){
-                $hosts = explode(',',$hosts);
-            }
-            if(is_array($hosts)){
-                $hosts = array_map(function ($host)use($hosts_config){
-                    $hosts_config['host'] = $host;
-                    return $hosts_config;
-                    },$hosts);
-                }else{
-       
-                $hosts = [$hosts_config];
-            }
-            return ClientBuilder::create()->setHosts($hosts)->build();
-        });
 
 # Get query log
 

@@ -14,7 +14,10 @@ class ElasticsearchServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+//        $this->mer
+        $this->publishes([
+            __DIR__.'/config/elasticsearch.php' => config_path('elasticsearch.php'),
+        ],'config');
     }
 
     /**
@@ -24,23 +27,24 @@ class ElasticsearchServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if(env('APP_DEBUG')===true&&class_exists('Barryvdh\Debugbar\Facade')){
+        $this->mergeConfigFrom(
+            __DIR__.'/config/elasticsearch.php', 'elasticsearch'
+        );
+        if(config('debug',false)===true&&class_exists('Barryvdh\Debugbar\Facade')){
             \Barryvdh\Debugbar\Facade::addCollector(new \DebugBar\DataCollector\MessagesCollector('elasticsearch'));
-            define('ELASTICSEARCH_LOG_DEBUGBAR',true);
         }
-        if(!defined('ELASTICSEARCH_LOG_DEBUGBAR')) define('ELASTICSEARCH_LOG_DEBUGBAR',false);
-        define('ELASTICSEARCH_INDEX_PREFIX',env('ELASTIC_INDEX_PREFIX',''));
+//        if(!defined('ELASTICSEARCH_LOG_DEBUGBAR')) define('ELASTICSEARCH_LOG_DEBUGBAR',false);
+//        define('ELASTICSEARCH_INDEX_PREFIX',env('ELASTIC_INDEX_PREFIX',''));
         $this->app->singleton('elastic_query', function ($app) {
-            $hosts = env('ELASTIC_HOST','localhost');
+            $hosts = config('elasticsearch.host');
             $hosts_config = [
-                'port'=>env('ELASTIC_PORT',9200),
-                'scheme'=>env('ELASTIC_SCHEME','http'),
+                'port'=>config('elasticsearch.post'),
+                'scheme'=>config('elasticsearch.scheme'),
                 'host'=>$hosts
             ];
-            if(!empty(env('ELASTIC_PASSWORD',null))) $hosts_config['pass'] = env('ELASTIC_PASSWORD');
-            if(!empty(env('ELASTIC_USERNAME',null))) $hosts_config['user'] = env('ELASTIC_USERNAME');
-            if(!empty(env('ELASTIC_PATH',null))) $hosts_config['path'] = env('ELASTIC_PATH');
-            if(!empty(env('ELASTIC_SCHEME',null))) $hosts_config['scheme'] = env('ELASTIC_SCHEME');
+            if(!empty(config('elasticsearch.password'))) $hosts_config['pass'] = config('elasticsearch.password');
+            if(!empty(config('elasticsearch.user'))) $hosts_config['user'] = config('elasticsearch.user');
+            if(!empty(config('elasticsearch.path'))) $hosts_config['path'] = config('elasticsearch.path');
             if(strpos($hosts,',')!==false){
                 $hosts = explode(',',$hosts);
             }

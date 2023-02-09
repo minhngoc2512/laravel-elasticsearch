@@ -1,7 +1,7 @@
 {
-    "name": "ngocnm/elastic-query",
+    "name": "ngocnm/laravel-elasticsearch",
     "type": "library",
-    "description": "Elasticsearch query",
+    "description": "Elasticsearch query for laravel",
     "authors": [
         {
             "name": "Mr.Ngoc",
@@ -10,7 +10,7 @@
     ],
     "funding": [
         {
-            "url": "https://github.com/minhngoc2512/elasticsearch-query",
+            "url": "https://github.com/minhngoc2512/laravel-elasticsearch",
             "type": "github"
         }
     ],
